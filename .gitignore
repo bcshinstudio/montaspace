@@ -1,0 +1,25 @@
+# Python virtual environment
+.venv/
+venv/
+
+# Python temporary files
+__pycache__/
+*.pyc
+*.pyo
+
+# Windows executable build outputs
+build/
+dist/
+*.spec
+installer-output/
+
+# Temporary files
+*.tmp
+*.log
+
+# VS Code local settings
+.vscode/
+
+# Local test projects
+*.mspace
+*.mspacepack
