@@ -18,3 +18,6 @@ installer-output/
 .vscode/
 *.log
 *.tmp
+
+# Optional test output if redirected to local project
+MontaSpace_Test_Reports/

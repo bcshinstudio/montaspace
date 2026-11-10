@@ -94,7 +94,17 @@ class Canvas(QGraphicsView):
 
     def add_image(self, filename, scene_pos=None, record_undo=True):
         before = self.capture_state() if record_undo else None
-        pixmap = load_preview(filename)
+        # Reuse Qt's implicitly-shared pixel storage when the same source is
+        # already present. No permanent image cache: memory can be reclaimed
+        # after all copies and Undo references are released.
+        source_key = str(Path(filename).resolve())
+        pixmap = None
+        for existing in self.image_stack():
+            if str(Path(existing.filename).resolve()) == source_key:
+                pixmap = existing.pixmap
+                break
+        if pixmap is None:
+            pixmap = load_preview(filename)
         if pixmap.isNull():
             return False
         item = ImageItem(pixmap, filename)

@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon, QKeySequence, QShortcut, QUndoStack
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from .config import APP_VERSION, PUBLISHER, COPYRIGHT, WEBSITE, asset_path
 from .canvas import Canvas
-from .performance import memory_working_set_mb
+from .performance import memory_working_set_mb, memory_peak_working_set_mb
 from .project import ProjectPersistenceMixin
 
 
@@ -72,12 +72,16 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
         working_set = memory_working_set_mb()
         ram_text = (f"{working_set:.1f} MB" if working_set is not None
                     else "Not available")
+        peak = memory_peak_working_set_mb()
+        peak_text = f"{peak:.1f} MB" if peak is not None else "Not available"
         QMessageBox.information(
             self, "MontaSpace — Performance Info",
             f"Images on board: {len(items)}\n"
             f"Unique image previews: {len(pixmaps)}\n"
             f"Estimated decoded preview pixels: {estimated_mb:.1f} MB\n"
-            f"Current process RAM (Windows working set): {ram_text}\n\n"
+            f"Current process RAM (Windows working set): {ram_text}\n"
+            f"Peak process RAM (since launch): {peak_text}\n"
+            f"Undo history entries: {self.undo_stack.count()}\n\n"
             "Preview pixel estimate excludes Qt, Undo history, and other "
             "application memory. Portable projects still embed original files."
         )
