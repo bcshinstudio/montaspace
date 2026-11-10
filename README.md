@@ -1,70 +1,78 @@
 # MontaSpace
 
-**Version:** 0.7.3 (development build)  
+**Version:** 0.8.0 — Step 8 structural refactor (Windows verification pending)  
 **Developer / Publisher:** BC Shin Studio  
 **Website:** https://www.bcshinstudio.com  
 **Copyright:** © 2026 BC Shin Studio. All rights reserved.
 
-MontaSpace is a lightweight, frameless Windows visual workspace for arranging pictures freely. Video support is planned for a future version.
+MontaSpace is a lightweight, frameless Windows visual workspace for arranging images. Video support remains planned, not implemented.
 
-## Features
+## What's changed in Step 8
 
-- Insert or drag/drop JPG, PNG, BMP, and WebP images.
-- Move, resize, rotate, crop, and arrange overlapping image layers.
-- Undo, redo, duplicate and select all images.
-- Save linked projects (`.mspace`) or portable projects with embedded images (`.mspacepack`).
-- Right-click anywhere on the whiteboard for file commands, image actions, **About MontaSpace**, and **Performance Info**.
+Only internal organization and version metadata were intentionally changed. The v0.7.3 behavior should remain unchanged; this **has not yet been confirmed on Windows**.
 
-## Developer setup
+- `main.py`: minimal application launcher
+- `app/window.py`: frameless Qt window, shortcuts, About and diagnostics
+- `app/canvas.py`: whiteboard scene, context menu, layers, drop handling
+- `app/image_item.py`: move / resize / rotate / non-destructive crop
+- `app/project.py`: existing `.mspace` / `.mspacepack` format, unchanged (`version: 1`)
+- `app/history.py`: Undo/Redo state snapshots
+- `app/imaging.py`: preview image decoding
+- `app/performance.py`: working-set measurement
+- `app/config.py`: settings, version, icon asset path
 
-Place the package contents in a folder such as `C:\Users\baech\Projects\montaspace`. Keep your existing `.venv/` if already installed. Otherwise:
+## Installation into your local project
+
+**Do not delete your old project folder.** First create a backup or use Git to preserve v0.7.3. Close MontaSpace. Copy the ZIP's contents *into* `C:\Users\baech\Projects\montaspace`, replacing matching files, and **keep the existing `.venv` folder and `.git` folder**. The ZIP contains neither. Existing `.mspace` and `.mspacepack` files or original photos should never be deleted.
+
+To run on Windows:
 
 ```cmd
-python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
+cd C:\Users\baech\Projects\montaspace
 .venv\Scripts\python.exe main.py
 ```
 
-## Build a portable Windows executable
+If dependencies are missing:
 
-Run `build_windows.bat` **on Windows as a developer**. It uses PyInstaller to produce `dist\MontaSpace\MontaSpace.exe`. Distribute the **entire** `dist\MontaSpace` directory, including `_internal`; it is not a one-file installer. End users do not need this `.bat` file or Python.
+```cmd
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
 
-The build script embeds the MontaSpace `.ico` as the executable icon and embeds `windows_version_info.txt` as Windows Explorer file metadata (Company, Product, File Version and Copyright). The same icon is applied to the application window and taskbar through PySide6. Taskbar or shortcut icon display can be subject to Windows caching and must be tested on Windows.
+## Features retained from v0.7.3
 
-### Where the icon is used
+- JPG, PNG, BMP, WebP insertion (file picker and drag/drop)
+- Frameless window movement (Alt+drag) and native edge resizing
+- Individual image move, resize, rotate, Ctrl+wheel scaling
+- Non-destructive crop; overlapping-image selection and layer arrangement
+- Undo/Redo, duplicate, select all and delete
+- Linked `.mspace` and portable `.mspacepack` projects
+- About and Performance Info dialogs
+- BC Shin Studio credits and Windows application icon
 
-- `assets/MontaSpace.ico` — the **one** visual branding asset in this source package.
-- During source runs: window/taskbar icon in the Qt application.
-- After EXE build: EXE file icon, application/taskbar icon.
-- No photographs, promotional collages, banners, splash screens or extra interface decorations are bundled or displayed.
+## Test before committing
 
-## BC Shin Studio and rights
+1. Launch, inspect About (0.8.0), and verify the icon and memory reporting.
+2. Insert photos; move, resize, rotate, Ctrl+wheel zoom, crop and recrop.
+3. Test overlapping image selection, front/back ordering and crop priority.
+4. Undo/Redo, duplicate, select all and delete.
+5. Open **existing v0.7.3** `.mspace` and `.mspacepack` files.
+6. Save new linked and portable projects, close and reopen them.
+7. Test unsaved-change confirmation when closing, New, and Open.
+8. After above pass, run `build_windows.bat` to build `dist\MontaSpace\MontaSpace.exe` and test separately.
 
-MontaSpace was developed by **BC Shin Studio**.
+## Packaging
 
-**© 2026 BC Shin Studio. All rights reserved.**
+`build_windows.bat` uses PyInstaller on Windows to create a portable **one-folder** executable. The full `dist\MontaSpace` folder is needed for distribution. This is not a Windows installer. The EXE uses `assets\MontaSpace.ico` and `windows_version_info.txt` (version 0.8.0).
 
-This notice applies to the MontaSpace software and project materials to the extent legally protectable. It does not claim ownership of user-imported images or third-party components. Users retain ownership and responsibility for images they insert. The program's name should be cleared for trademark conflicts before public release; a copyright notice alone does not establish trademark rights.
+## Licensing and project rights
 
-The application uses Python and PySide6/Qt, which have separate licenses. Before redistribution, review PySide6/Qt licensing obligations (including relevant LGPL provisions) and distribute applicable third-party notices/licenses. This development package is not a legal clearance or a complete public-release compliance bundle.
-
-## Files to keep
-
-- `main.py` — application
-- `assets/MontaSpace.ico` — launcher icon
-- `README.md` — project information
-- `requirements.txt` — dependencies
-- `windows_version_info.txt` — Windows EXE metadata
-- `build_windows.bat` — developer build tool
-- `.gitignore` — optional Git exclusions
-- `.venv/` — your existing Python environment (not distributed)
-
-Generated `build/`, `dist/`, and `MontaSpace.spec` can be recreated. Do not delete original photos or `.mspace`/`.mspacepack` projects when cleaning generated output.
+© 2026 BC Shin Studio. All rights reserved. User-supplied images are not owned by BC Shin Studio. Python, PySide6/Qt and PyInstaller have independent licenses; review applicable redistribution obligations before a public release. Trademark clearance and code signing are separate steps.
 
 ## Version history
 
-- **0.7.3** — BC Shin Studio attribution in application and README; Windows EXE file-property metadata; launcher icon packaging.
-- **0.7.2** — branded About dialog and runtime icon integration.
-- **0.7.1** — fixed Windows process RAM reporting.
+- **0.8.0** — Split the monolithic application into modules; no planned behavior changes.
+- **0.7.3** — Publisher attribution, Windows EXE metadata, official icon, working baseline tagged in Git.
 
-**Status:** Python syntax validated; Windows GUI and PyInstaller output must be tested on a Windows machine.
+## Git tip
+
+Do not replace the `.git` directory. After Windows tests pass, check `git status`, then commit the new modules. Do **not** overwrite the existing `v0.7.3` Git tag.

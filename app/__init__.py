@@ -1,0 +1,1 @@
+"""MontaSpace application package."""
