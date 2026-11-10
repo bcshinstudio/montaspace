@@ -1,16 +1,18 @@
 """Frameless application window, shortcuts, menus, and metadata."""
 from pathlib import Path
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut, QUndoStack
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from .config import APP_VERSION, PUBLISHER, COPYRIGHT, WEBSITE, asset_path
 from .canvas import Canvas
 from .performance import memory_working_set_mb, memory_peak_working_set_mb
 from .project import ProjectPersistenceMixin
+from .window_resize import (EDGE_MARGIN, ResizeHint, resize_cursor,
+                            resize_edges_for_point)
 
 
 class MontaSpace(ProjectPersistenceMixin, QMainWindow):
-    RESIZE_MARGIN = 8
+    RESIZE_MARGIN = EDGE_MARGIN
 
     def __init__(self):
         super().__init__()
@@ -21,6 +23,14 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
         self.setMinimumSize(400, 300)
         self.canvas = Canvas(self)
         self.setCentralWidget(self.canvas)
+        # The viewport covers almost the entire frameless window. Qt delivers
+        # most pointer events to it rather than to QMainWindow.
+        self._resize_hint = ResizeHint(self.canvas.viewport())
+        self._resize_hover_edges = Qt.Edge(0)
+        self.canvas.setMouseTracking(True)
+        self.canvas.viewport().setMouseTracking(True)
+        self.canvas.installEventFilter(self)
+        self.canvas.viewport().installEventFilter(self)
 
         self.project_path = None
         self.undo_stack = QUndoStack(self)
@@ -115,16 +125,46 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
             event.ignore()
 
     def resize_edges(self, position):
-        edges = Qt.Edge(0)
-        if position.x() < self.RESIZE_MARGIN:
-            edges |= Qt.Edge.LeftEdge
-        elif position.x() >= self.width() - self.RESIZE_MARGIN:
-            edges |= Qt.Edge.RightEdge
-        if position.y() < self.RESIZE_MARGIN:
-            edges |= Qt.Edge.TopEdge
-        elif position.y() >= self.height() - self.RESIZE_MARGIN:
-            edges |= Qt.Edge.BottomEdge
-        return edges
+        return resize_edges_for_point(position, self.width(), self.height())
+
+    def update_resize_hover(self, position):
+        """Expose a directional cursor and a small border hint near edges."""
+        edges = self.resize_edges(position)
+        changed = edges != self._resize_hover_edges
+        self._resize_hover_edges = edges
+        cursor = resize_cursor(edges)
+        # Reapply the border cursor even if the zone has not changed: an image
+        # item may update the viewport cursor during graphics-scene hover.
+        if cursor is not None:
+            self.canvas.viewport().setCursor(cursor)
+        elif changed:
+            self.canvas.viewport().unsetCursor()
+        if changed:
+            self._resize_hint.show_edges(edges)
+
+    def clear_resize_hover(self):
+        self._resize_hover_edges = Qt.Edge(0)
+        self.canvas.viewport().unsetCursor()
+        self._resize_hint.show_edges(Qt.Edge(0))
+
+    def eventFilter(self, watched, event):
+        # Keep the overlay sized to the actual image viewport and track its
+        # pointer events, including when the pointer is over a photo.
+        viewport = self.canvas.viewport()
+        if watched is viewport:
+            if event.type() == QEvent.Type.Resize:
+                self._resize_hint.setGeometry(viewport.rect())
+            elif event.type() == QEvent.Type.MouseMove:
+                self.update_resize_hover(viewport.mapTo(self, event.position().toPoint()))
+            elif event.type() == QEvent.Type.Enter:
+                from PySide6.QtGui import QCursor
+                self.update_resize_hover(viewport.mapTo(self, viewport.mapFromGlobal(QCursor.pos())))
+            elif event.type() == QEvent.Type.Leave:
+                self.clear_resize_hover()
+        elif watched is self.canvas:
+            if event.type() == QEvent.Type.MouseMove:
+                self.update_resize_hover(self.canvas.mapTo(self, event.position().toPoint()))
+        return super().eventFilter(watched, event)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:

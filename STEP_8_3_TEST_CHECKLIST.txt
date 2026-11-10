@@ -1,0 +1,14 @@
+MontaSpace v0.8.3 — Windows validation
+
+1. Start using .venv\Scripts\python.exe main.py; About says v0.8.3.
+2. Move pointer over each of 4 edges: horizontal/vertical resize cursors and subtle short blue line.
+3. Move pointer over each corner: diagonal cursor and blue L-shaped corner indicator.
+4. Drag all 8 border positions to resize; no app freezes or unexpected image dragging.
+5. Move pointer away: no permanent border; ordinary image hover/move cursor returns.
+6. Alt + left-drag on empty board moves the window.
+7. Right-click image/blank space shows menus normally; Ctrl + right-click not assigned.
+8. Insert/move/resize/rotate/crop images, Undo/Redo, save and reopen .mspace and .mspacepack.
+9. If tests pass, build installer with build_installer.bat; test installation and uninstallation.
+
+Note: The generated installer will be v0.8.3. Do not overwrite your working
+v0.8.2 installer until the new build is verified.

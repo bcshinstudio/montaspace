@@ -430,6 +430,13 @@ class Canvas(QGraphicsView):
             return
         super().keyPressEvent(event)
 
+    def mouseMoveEvent(self, event):
+        super().mouseMoveEvent(event)
+        # Scene items may change the pointer shape during their hover handling.
+        # Window borders should still advertise their resize affordance.
+        window_pos = self.mapTo(self.window, event.position().toPoint())
+        self.window.update_resize_hover(window_pos)
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             pos = self.mapTo(self.window, event.position().toPoint())

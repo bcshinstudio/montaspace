@@ -1,54 +1,45 @@
-# MontaSpace
+# MontaSpace v0.8.3 — Step 10 Windows installer
 
-**Version:** 0.8.1 — Step 9 performance and stability update  
-**Publisher:** BC Shin Studio  
-**Website:** https://www.bcshinstudio.com  
-**Copyright:** © 2026 BC Shin Studio. All rights reserved.
+This package is the full v0.8.1 tested source plus the NSIS installer build kit.
+The application version was increased to v0.8.3 only for installer distribution;
+no project format or editing behavior was intentionally changed.
 
-MontaSpace is a lightweight, frameless Windows workspace for freely arranging, resizing, rotating, cropping, and layering images. Video playback remains a future feature.
+## Installation on your development machine
+1. **Back up** `C:\Users\baech\Projects\montaspace` or commit your current changes.
+2. Close MontaSpace. Extract/copy this package's **contents** into the existing project folder.
+   Do not delete `.git` or `.venv`, and do not copy ZIP contents one folder too deep.
+3. Double-click **build_installer.bat** in the MontaSpace folder.
+   It runs PyInstaller then the installed NSIS compiler.
+4. Output: `installer-output\MontaSpace_Setup_0.8.3.exe`.
+5. Run the output setup, select optional desktop shortcut, and test per
+   `INSTALLER_TEST_CHECKLIST.txt`.
 
-## Changes from verified v0.8.0
+Installer: per-user directory `%LOCALAPPDATA%\Programs\MontaSpace` with no
+administrator permissions normally needed; Windows Settings uninstaller and Start
+menu shortcut. It does **not** install Python on a target PC: PyInstaller bundles
+app dependencies into the executable folder within the installer.
 
-- Reuse already decoded Qt image data when inserting the same photo multiple times; independent crop/transform controls are preserved. Does not create an unbounded background cache.
-- Performance Info now includes peak process RAM (since launch) and undo-history entries.
-- `run_stress_test.bat` and `tools/stress_test.py`: optional, isolated performance tests generating 25–100 **temporary synthetic images**. Measure image insertion, linked/portable save and reopen times, and RAM. Outputs JSON results to `Documents\MontaSpace_Test_Reports`.
-- Updated About/version metadata to 0.8.1. No changes to `.mspace` or `.mspacepack` schema (still format version 1).
+Project files (`.mspace`, `.mspacepack`) saved elsewhere (e.g. Documents) are not
+removed by uninstall. Do not save personal projects inside the application install
+folder, since uninstall removes that folder and all its contents.
 
-## Update instructions
+This installer is **unsigned**; SmartScreen may warn on download. Do not advise
+others to bypass warnings. Proper code signing is a separate public-release step.
 
-Keep your existing `.git` and `.venv` folders. Close MontaSpace first. Extract ZIP and copy the included files/folders into `C:\Users\baech\Projects\montaspace`, merging existing directories. **Never delete the entire existing folder** to install an update. Preserve any personal saved projects and original photos.
+NSIS and PyInstaller can build the installer without an NSIS commercial license.
 
-Run: `.venv\Scripts\python.exe main.py`
+### Testing limitations
+Python source and archive can be syntax/integrity checked here. The Windows NSIS
+compiler and PyInstaller build must be run and validated on your Windows machine.
+Do not tag/publish v0.8.3 until Windows installer/uninstaller tests pass.
 
-## Performance testing
 
-Close MontaSpace first, then run these commands from the project directory:
+## v0.8.3: Resizing and window usability
 
-```cmd
-run_stress_test.bat 25
-run_stress_test.bat 50
-```
+- Resize from all four edges and all four corners; corners are easier to grab.
+- Move the pointer near the border to see the appropriate resize cursor and a
+  subtle blue edge/corner indicator. No permanent frame is added.
+- Alt + left-drag moves the window; right-click still opens the image menu.
+- Existing projects and image editing workflows remain unchanged.
 
-Optional on a machine with sufficient memory: `run_stress_test.bat 100`
-
-The test creates synthetic JPEGs and temporary test project files in the system temporary directory; it does **not** access personal photos or overwrite user projects. Results are saved as JSON in the Documents folder. Peak working-set measurements are Windows-specific.
-
-The test can briefly use substantial RAM: preview images up to 1600 px per edge are deliberately not reduced further because that might change UI quality. A larger preview and many distinct photographs can consume hundreds of MB or more.
-
-## Features
-
-Drag and drop PNG/JPEG/BMP/WebP; select, move, resize, rotate, Ctrl+wheel resize; non-destructive cropping; overlap-aware layer ordering; Undo/Redo; duplicate, select all, delete; linked and portable projects; frameless window; Windows process memory reporting.
-
-## Windows build
-
-Run `build_windows.bat` to build the optional portable one-folder `dist\MontaSpace` executable. Users receive this full folder, not the build script. Commercial installer planning remains separate.
-
-## Licensing
-
-© 2026 BC Shin Studio. All rights reserved. User-supplied photographs remain their owners' property. Python, PySide6/Qt, and PyInstaller have independent licensing requirements; review these before public redistribution.
-
-## Version history
-
-- **0.8.1**: performance diagnostics, shared previews for repeated image files, opt-in stress test.
-- **0.8.0**: verified modular refactor.
-- **0.7.3**: publisher/icon stable baseline.
+Windows GUI behavior needs to be validated on your PC before creating a new installer.
