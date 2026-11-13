@@ -3,7 +3,7 @@ Unicode true
 !include "LogicLib.nsh"
 
 !define PRODUCT_NAME "MontaSpace"
-!define PRODUCT_VERSION "0.8.3"
+!define PRODUCT_VERSION "0.8.5"
 !define PRODUCT_PUBLISHER "BC Shin Studio"
 !define PRODUCT_URL "https://www.bcshinstudio.com"
 !define PRODUCT_EXE "MontaSpace.exe"
@@ -15,12 +15,12 @@ InstallDir "$LOCALAPPDATA\Programs\MontaSpace"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 
-VIProductVersion "0.8.3.0"
+VIProductVersion "0.8.5.0"
 VIAddVersionKey "ProductName" "${PRODUCT_NAME}"
 VIAddVersionKey "CompanyName" "${PRODUCT_PUBLISHER}"
 VIAddVersionKey "FileDescription" "MontaSpace Installer"
-VIAddVersionKey "FileVersion" "0.8.3.0"
-VIAddVersionKey "ProductVersion" "0.8.3"
+VIAddVersionKey "FileVersion" "0.8.5.0"
+VIAddVersionKey "ProductVersion" "0.8.5"
 VIAddVersionKey "LegalCopyright" "Copyright (C) 2026 BC Shin Studio. All rights reserved."
 
 !define MUI_ABORTWARNING
@@ -54,6 +54,7 @@ Section "MontaSpace application (required)" SecApp
 
   WriteRegStr HKCU "${UNINSTALL_KEY}" "DisplayName" "MontaSpace ${PRODUCT_VERSION}"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
+  WriteRegStr HKCU "${UNINSTALL_KEY}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "URLInfoAbout" "${PRODUCT_URL}"
   WriteRegStr HKCU "${UNINSTALL_KEY}" "DisplayIcon" "$INSTDIR\${PRODUCT_EXE}"

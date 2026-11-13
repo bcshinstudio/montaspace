@@ -10,6 +10,7 @@ from pathlib import Path
 from PySide6.QtCore import QRectF, QTemporaryDir
 from PySide6.QtWidgets import QMessageBox, QFileDialog
 from .config import PROJECT_FILTER
+from .project_reliability import verify_staged_project
 
 
 class ProjectPersistenceMixin(object):
@@ -138,6 +139,7 @@ class ProjectPersistenceMixin(object):
                 with temp_path.open("w", encoding="utf-8") as stream:
                     json.dump(payload, stream, indent=2, ensure_ascii=False)
                     stream.write("\n")
+            verify_staged_project(temp_path, len(records), portable)
             os.replace(temp_path, target)
         except (OSError, ValueError, zipfile.BadZipFile) as exc:
             QMessageBox.critical(self, "Save failed", str(exc))
@@ -178,7 +180,10 @@ class ProjectPersistenceMixin(object):
                     data = json.loads(package.read("project.json").decode("utf-8"))
                     if not isinstance(data, dict):
                         raise ValueError("Invalid project metadata.")
-                    files = {info.filename: info for info in package.infolist()}
+                    members = package.infolist()
+                    files = {info.filename: info for info in members}
+                    if len(files) != len(members):
+                        raise ValueError("Portable project contains duplicate archive entries.")
                     if len(files) > 10001:
                         raise ValueError("Portable project contains too many files.")
                     names = {rec["source"] for rec in data.get("images", [])}
@@ -239,6 +244,7 @@ class ProjectPersistenceMixin(object):
             rect = QRectF(*crop).intersected(item.full_rect)
             if rect.width() >= item.MIN_CROP and rect.height() >= item.MIN_CROP:
                 item.crop_rect = rect
+                item._refresh_handles()
                 item.update()
         self.canvas.scene_area.clearSelection()
         self.project_path = target

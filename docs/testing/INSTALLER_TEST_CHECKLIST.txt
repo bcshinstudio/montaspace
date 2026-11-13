@@ -1,17 +1,39 @@
-MontaSpace v0.8.2 — Installer checklist (Windows)
+MontaSpace v0.8.5 — Windows release candidate verification
 
-1. Build: Double-click build_installer.bat. Confirm installer-output\MontaSpace_Setup_0.8.2.exe exists.
-2. Install: Run setup. Confirm the installer offers user-level directory and optional desktop shortcut.
-3. Launch from Start menu. About should display v0.8.2.
-4. Insert, crop, rotate, resize, and move an image. Undo/Redo.
-5. Open an existing .mspace and .mspacepack file.
-6. Save a NEW linked and portable project under Documents, outside installation folder.
-7. Close app, uninstall through Windows Settings -> Apps -> Installed apps.
-8. Confirm Start menu and desktop shortcuts removed.
-9. Confirm saved projects under Documents remain intact.
-10. Optional: Reinstall and verify project files still open.
+PRE-BUILD
+[ ] Back up valuable .mspace and .mspacepack projects.
+[ ] In project folder, .venv\Scripts\python.exe tools\verify_release.py -> PASS.
+[ ] run_regression_tests.bat -> all 16 tests pass, no GUI skips.
+[ ] run_stress_suite.bat -> 25/50/100 image scenarios pass.
 
-IMPORTANT: Back up important projects before testing. Do not uninstall an older build installed
-under the same path while it is running. For first release, test on your own PC before distributing.
+BUILD
+[ ] Run build_installer.bat (NSIS installed). Build must exit without errors.
+[ ] Confirm installer-output\MontaSpace_Setup_0.8.5.exe exists.
+[ ] Confirm dist\MontaSpace\MontaSpace.exe exists (kept for standalone inspection).
+[ ] Inspect EXE Properties > Details: file and product version 0.8.5.0.
+[ ] Inspect installer Properties > Details: version 0.8.5.0 and BC Shin Studio.
 
-Do not publish the setup EXE until it has been built and tested on Windows.
+INSTALL AND CHECK
+[ ] Close any old running MontaSpace, then install the new setup.
+[ ] Launch from Start menu and check About MontaSpace 0.8.5 / BC Shin Studio.
+[ ] Insert JPG and PNG using dialog and Explorer drag/drop.
+[ ] Move, resize from corners and edges, rotate; crop and re-crop.
+[ ] Test overlapped images, Bring to front and selection context menu.
+[ ] Test Ctrl+Z, Ctrl+Y, Ctrl+D, Ctrl+A, Delete.
+[ ] Open an existing .mspace and .mspacepack file.
+[ ] Save NEW linked and portable projects in Documents, close, relaunch, reopen.
+[ ] Confirm images render and transforms persist.
+[ ] Open Performance Info dialog; no crash.
+[ ] Uninstall via Windows Settings > Apps; shortcuts and app folder removed.
+[ ] From the project folder run verify_uninstall.bat (or verify_uninstall.bat "custom folder").
+[ ] Confirm Windows Settings no longer lists MontaSpace.
+[ ] No thumbnail-cache checkbox is expected: image-only MontaSpace has no persistent video-poster cache.
+[ ] Previously saved Documents projects still exist and open on reinstall.
+
+RELEASE GATE
+[ ] No significant regressions, crashes or data loss.
+[ ] Record clean-install result and package SHA256 with PowerShell:
+    Get-FileHash .\installer-output\MontaSpace_Setup_0.8.5.exe -Algorithm SHA256
+[ ] Do not publish if any required check fails or is untested.
+
+Note: Installer is unsigned; Windows SmartScreen may show an unrecognized-publisher warning.

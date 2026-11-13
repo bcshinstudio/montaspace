@@ -55,6 +55,7 @@ class Canvas(QGraphicsView):
                 item.setScale(scale)
                 item.setRotation(angle)
                 item.crop_rect = QRectF(*crop)
+                item._refresh_handles()
                 item.setZValue(z)
                 item.update()
             self.scene_area.clearSelection()
@@ -82,6 +83,7 @@ class Canvas(QGraphicsView):
         for original in selected:
             copy = ImageItem(original.pixmap, original.filename)
             copy.crop_rect = QRectF(original.crop_rect)
+            copy._refresh_handles()
             copy.setPos(original.pos().x() + 30, original.pos().y() + 30)
             copy.setScale(original.scale())
             copy.setRotation(original.rotation())
@@ -270,7 +272,17 @@ class Canvas(QGraphicsView):
             actions[action] = (image, operation)
 
     def contextMenuEvent(self, event):
-        """Show file actions plus the photos under the pointer."""
+        """Select the photo under a right-click before building its menu."""
+        if not self.active_crop:
+            # images_at() respects the visible crop and returns front-to-back.
+            # Preserve multi-selection if the clicked photo is already selected.
+            hovered = self.images_at(event.pos())
+            if hovered:
+                target = hovered[0]
+                if not target.isSelected():
+                    self.scene_area.clearSelection()
+                    target.setSelected(True)
+
         menu = QMenu(self)
         if self.active_crop:
             apply_action = menu.addAction("Apply Crop (Enter)")

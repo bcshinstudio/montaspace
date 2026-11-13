@@ -1,25 +1,28 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+set "PY=.venv\Scripts\python.exe"
+set "SETUP=installer-output\MontaSpace_Setup_0.8.5.exe"
 
-echo MontaSpace v0.8.3 - build application + free NSIS installer
-echo.
-if not exist ".venv\Scripts\python.exe" (
-  echo ERROR: Missing .venv. Keep your existing Python virtual environment.
-  goto :fail
-)
-if not exist "assets\MontaSpace.ico" (
-  echo ERROR: assets\MontaSpace.ico not found.
+echo MontaSpace v0.8.5 - release-candidate installer build
+if not exist "%PY%" (
+  echo ERROR: Missing .venv Python environment.
   goto :fail
 )
 
-if not exist "installer-output" mkdir "installer-output"
+"%PY%" "tools\verify_release.py"
+if errorlevel 1 goto :fail
 
-rem PyInstaller produces a folder with the EXE and its bundled dependencies.
-".venv\Scripts\python.exe" -m pip install "PyInstaller>=6,<7"
+rem Refuse to package a build that fails its regression tests.
+call "run_regression_tests.bat"
 if errorlevel 1 goto :fail
-".venv\Scripts\python.exe" -m PyInstaller --clean --noconfirm --onedir --windowed --name MontaSpace --icon "assets\MontaSpace.ico" --add-data "assets\MontaSpace.ico;assets" --version-file "windows_version_info.txt" main.py
-if errorlevel 1 goto :fail
+
+"%PY%" -m PyInstaller --version >nul 2>&1
+if errorlevel 1 (
+  echo ERROR: PyInstaller is not installed in the virtual environment.
+  echo Install it with: .venv\Scripts\python.exe -m pip install "PyInstaller>=6,<7"
+  goto :fail
+)
 
 set "MAKENSIS=%ProgramFiles(x86)%\NSIS\makensis.exe"
 if not exist "%MAKENSIS%" set "MAKENSIS=%ProgramFiles%\NSIS\makensis.exe"
@@ -27,42 +30,37 @@ if not exist "%MAKENSIS%" (
   for %%M in (makensis.exe) do set "MAKENSIS=%%~$PATH:M"
 )
 if not exist "%MAKENSIS%" (
-  echo ERROR: Cannot locate makensis.exe.
-  echo Check the standard NSIS installation folder.
+  echo ERROR: NSIS makensis.exe not found; install free NSIS first.
   goto :fail
 )
 
-echo.
-echo Compiling NSIS installer...
+if not exist "installer-output" mkdir "installer-output"
+rem Remove only the old expected installer, not user/source files.
+if exist "%SETUP%" del /q "%SETUP%"
+
+"%PY%" -m PyInstaller --clean --noconfirm --onedir --windowed --name MontaSpace --icon "assets\MontaSpace.ico" --add-data "assets\MontaSpace.ico;assets" --version-file "windows_version_info.txt" main.py
+if errorlevel 1 goto :fail
+if not exist "dist\MontaSpace\MontaSpace.exe" (
+  echo ERROR: PyInstaller returned success but EXE is missing.
+  goto :fail
+)
+
 "%MAKENSIS%" "installer\MontaSpace.nsi"
 if errorlevel 1 goto :fail
-
-rem Never clean intermediate files unless the expected installer exists.
-if not exist "installer-output\MontaSpace_Setup_0.8.3.exe" (
-  echo ERROR: NSIS returned success, but the expected installer is missing.
+if not exist "%SETUP%" (
+  echo ERROR: NSIS returned success but installer is missing.
   goto :fail
 )
 
-rem Build succeeded: remove only generated PyInstaller artifacts.
-rem Keep installer-output, .venv, .git, all source files, and user projects.
 echo.
-echo Removing temporary build artifacts...
-if exist "build\" rmdir /s /q "build"
-if exist "dist\" rmdir /s /q "dist"
-if exist "MontaSpace.spec" del /q "MontaSpace.spec"
-
-if exist "build\" echo WARNING: Could not fully remove build\. Delete it later if unused.
-if exist "dist\" echo WARNING: Could not fully remove dist\. Close running EXEs and retry later.
-if exist "MontaSpace.spec" echo WARNING: Could not remove MontaSpace.spec.
-
+echo PASS: installer build completed. Windows installation testing is still required.
+echo Installer: %SETUP%
+echo Standalone app: dist\MontaSpace\MontaSpace.exe
 echo.
-echo SUCCESS: installer-output\MontaSpace_Setup_0.8.3.exe
-echo NOTE: The installer is unsigned, so Windows may show a SmartScreen warning.
-pause
+echo Next: docs\testing\INSTALLER_TEST_CHECKLIST.txt
 exit /b 0
 
 :fail
 echo.
-echo BUILD FAILED. Check the error above. The source has not been deleted.
-pause
+echo FAIL: No publishable release package was verified.
 exit /b 1

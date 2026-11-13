@@ -1,45 +1,38 @@
-# MontaSpace v0.8.3 — Step 10 Windows installer
+# MontaSpace v0.8.5 — Photo-only workspace
 
-This package is the full v0.8.1 tested source plus the NSIS installer build kit.
-The application version was increased to v0.8.3 only for installer distribution;
-no project format or editing behavior was intentionally changed.
+MontaSpace is the lightweight image-only edition of MontaSpace Studio, published by BC Shin Studio. It does not require video decoding or multimedia libraries.
 
-## Installation on your development machine
-1. **Back up** `C:\Users\baech\Projects\montaspace` or commit your current changes.
-2. Close MontaSpace. Extract/copy this package's **contents** into the existing project folder.
-   Do not delete `.git` or `.venv`, and do not copy ZIP contents one folder too deep.
-3. Double-click **build_installer.bat** in the MontaSpace folder.
-   It runs PyInstaller then the installed NSIS compiler.
-4. Output: `installer-output\MontaSpace_Setup_0.8.3.exe`.
-5. Run the output setup, select optional desktop shortcut, and test per
-   `INSTALLER_TEST_CHECKLIST.txt`.
+## Improvements brought over from Studio
+- Eight photo edge/corner editing grips with consistent on-screen sizes at any zoom level.
+- Improved edge hit detection and crop handles, while keeping photo rotation.
+- Performance Info now includes Windows private committed memory alongside working set, peak and estimated preview pixels.
+- Portable and linked project output is verified *before* replacing an existing file; portable archives reject duplicate entries on open.
+- New automated regression runner, with Qt-free logic checks and real GUI smoke tests.
 
-Installer: per-user directory `%LOCALAPPDATA%\Programs\MontaSpace` with no
-administrator permissions normally needed; Windows Settings uninstaller and Start
-menu shortcut. It does **not** install Python on a target PC: PyInstaller bundles
-app dependencies into the executable folder within the installer.
+## Run and test on Windows
 
-Project files (`.mspace`, `.mspacepack`) saved elsewhere (e.g. Documents) are not
-removed by uninstall. Do not save personal projects inside the application install
-folder, since uninstall removes that folder and all its contents.
+Keep your existing `.venv` virtual environment when copying this update over your project.
 
-This installer is **unsigned**; SmartScreen may warn on download. Do not advise
-others to bypass warnings. Proper code signing is a separate public-release step.
+```bat
+run_regression_tests.bat
+run_stress_test.bat 25
+run_stress_test.bat 50
+run_stress_test.bat 100
+.venv\Scripts\python.exe main.py
+```
 
-NSIS and PyInstaller can build the installer without an NSIS commercial license.
+A missing PySide6 installation, failed test, or timeout makes the regression runner exit unsuccessfully. Tests use disposable images and projects. See `docs/AUTOMATED_REGRESSION_TESTS.md`.
 
-### Testing limitations
-Python source and archive can be syntax/integrity checked here. The Windows NSIS
-compiler and PyInstaller build must be run and validated on your Windows machine.
-Do not tag/publish v0.8.3 until Windows installer/uninstaller tests pass.
+## Windows installer
 
+After completing Windows regression and stress tests, install free NSIS and PyInstaller in your existing `.venv`, then run `build_installer.bat`. The build verifies release metadata, reruns regressions, and retains the standalone build for inspection. Output: `installer-output\MontaSpace_Setup_0.8.5.exe`. Windows packaging cannot run in a Linux-only environment.
 
-## v0.8.3: Resizing and window usability
+## Project compatibility
 
-- Resize from all four edges and all four corners; corners are easier to grab.
-- Move the pointer near the border to see the appropriate resize cursor and a
-  subtle blue edge/corner indicator. No permanent frame is added.
-- Alt + left-drag moves the window; right-click still opens the image menu.
-- Existing projects and image editing workflows remain unchanged.
+`.mspace` and `.mspacepack` project formats are **unchanged**. MontaSpace remains image-only. Studio video project formats are distinct (`.mstudio`, `.mstudiopack`).
 
-Windows GUI behavior needs to be validated on your PC before creating a new installer.
+Version 0.8.5 is a **candidate for Windows validation**, not a certified public release.
+
+## Release readiness
+
+Run `.venv\Scripts\python.exe tools\verify_release.py` to check version consistency. Complete `docs/testing/INSTALLER_TEST_CHECKLIST.txt` before GitHub publication.
