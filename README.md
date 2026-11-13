@@ -1,4 +1,4 @@
-# MontaSpace v0.8.5 — Photo-only workspace
+# MontaSpace v0.8.6 — Photo-only workspace
 
 MontaSpace is the lightweight image-only edition of MontaSpace Studio, published by BC Shin Studio. It does not require video decoding or multimedia libraries.
 
@@ -25,13 +25,13 @@ A missing PySide6 installation, failed test, or timeout makes the regression run
 
 ## Windows installer
 
-After completing Windows regression and stress tests, install free NSIS and PyInstaller in your existing `.venv`, then run `build_installer.bat`. The build verifies release metadata, reruns regressions, and retains the standalone build for inspection. Output: `installer-output\MontaSpace_Setup_0.8.5.exe`. Windows packaging cannot run in a Linux-only environment.
+After completing Windows regression and stress tests, install free NSIS and PyInstaller in your existing `.venv`, then run `build_installer.bat`. The build verifies release metadata, reruns regressions, and retains the standalone build for inspection. Output: `installer-output\MontaSpace_Setup_0.8.6.exe`. Windows packaging cannot run in a Linux-only environment.
 
 ## Project compatibility
 
 `.mspace` and `.mspacepack` project formats are **unchanged**. MontaSpace remains image-only. Studio video project formats are distinct (`.mstudio`, `.mstudiopack`).
 
-Version 0.8.5 is a **candidate for Windows validation**, not a certified public release.
+Version 0.8.6 is a **candidate for Windows validation**, not a certified public release.
 
 ## Release readiness
 

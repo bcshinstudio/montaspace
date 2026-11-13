@@ -26,7 +26,7 @@ class ReleasePreflightTests(unittest.TestCase):
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / name, dst)
             version = root / "windows_version_info.txt"
-            version.write_text(version.read_text().replace("filevers=(0, 8, 5, 0)",
+            version.write_text(version.read_text().replace("filevers=(0, 8, 6, 0)",
                                                         "filevers=(0, 8, 4, 0)"))
             self.assertTrue(any("filevers=" in x for x in verify(root)))
 

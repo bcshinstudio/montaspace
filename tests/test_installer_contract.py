@@ -14,12 +14,12 @@ class InstallerContractTests(unittest.TestCase):
         cls.meta = (ROOT / 'windows_version_info.txt').read_text(encoding='utf-8')
 
     def test_version_matches(self):
-        self.assertIn('APP_VERSION = "0.8.5"', self.config)
-        self.assertIn('!define PRODUCT_VERSION "0.8.5"', self.nsi)
-        self.assertIn('VIProductVersion "0.8.5.0"', self.nsi)
-        self.assertIn('filevers=(0, 8, 5, 0)', self.meta)
-        self.assertIn('prodvers=(0, 8, 5, 0)', self.meta)
-        self.assertIn('MontaSpace_Setup_0.8.5.exe', self.bat)
+        self.assertIn('APP_VERSION = "0.8.6"', self.config)
+        self.assertIn('!define PRODUCT_VERSION "0.8.6"', self.nsi)
+        self.assertIn('VIProductVersion "0.8.6.0"', self.nsi)
+        self.assertIn('filevers=(0, 8, 6, 0)', self.meta)
+        self.assertIn('prodvers=(0, 8, 6, 0)', self.meta)
+        self.assertIn('MontaSpace_Setup_0.8.6.exe', self.bat)
 
     def test_app_specific_registry_and_paths(self):
         self.assertIn('InstallLocation" "$INSTDIR"', self.nsi)

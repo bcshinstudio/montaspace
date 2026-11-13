@@ -1,4 +1,4 @@
-MontaSpace v0.8.5 — Windows release candidate verification
+MontaSpace v0.8.6 — Windows release candidate verification
 
 PRE-BUILD
 [ ] Back up valuable .mspace and .mspacepack projects.
@@ -8,14 +8,14 @@ PRE-BUILD
 
 BUILD
 [ ] Run build_installer.bat (NSIS installed). Build must exit without errors.
-[ ] Confirm installer-output\MontaSpace_Setup_0.8.5.exe exists.
+[ ] Confirm installer-output\MontaSpace_Setup_0.8.6.exe exists.
 [ ] Confirm dist\MontaSpace\MontaSpace.exe exists (kept for standalone inspection).
-[ ] Inspect EXE Properties > Details: file and product version 0.8.5.0.
-[ ] Inspect installer Properties > Details: version 0.8.5.0 and BC Shin Studio.
+[ ] Inspect EXE Properties > Details: file and product version 0.8.6.0.
+[ ] Inspect installer Properties > Details: version 0.8.6.0 and BC Shin Studio.
 
 INSTALL AND CHECK
 [ ] Close any old running MontaSpace, then install the new setup.
-[ ] Launch from Start menu and check About MontaSpace 0.8.5 / BC Shin Studio.
+[ ] Launch from Start menu and check About MontaSpace 0.8.6 / BC Shin Studio.
 [ ] Insert JPG and PNG using dialog and Explorer drag/drop.
 [ ] Move, resize from corners and edges, rotate; crop and re-crop.
 [ ] Test overlapped images, Bring to front and selection context menu.
@@ -33,7 +33,7 @@ INSTALL AND CHECK
 RELEASE GATE
 [ ] No significant regressions, crashes or data loss.
 [ ] Record clean-install result and package SHA256 with PowerShell:
-    Get-FileHash .\installer-output\MontaSpace_Setup_0.8.5.exe -Algorithm SHA256
+    Get-FileHash .\installer-output\MontaSpace_Setup_0.8.6.exe -Algorithm SHA256
 [ ] Do not publish if any required check fails or is untested.
 
 Note: Installer is unsigned; Windows SmartScreen may show an unrecognized-publisher warning.

@@ -4,10 +4,10 @@ from pathlib import Path
 
 
 PROJECT_FILTER = "MontaSpace Linked (*.mspace);;MontaSpace Portable (*.mspacepack)"
-IMAGE_FILTER = "Images (*.png *.jpg *.jpeg *.bmp *.webp)"
-SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".webp"}
+IMAGE_FILTER = "Images (*.png *.jpg *.jpeg *.bmp *.webp *.gif *.tif *.tiff *.heic *.heif *.avif)"
+SUPPORTED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.webp', '.gif', '.tif', '.tiff', '.heic', '.heif', '.avif'}
 PREVIEW_MAX_EDGE = 1600
-APP_VERSION = "0.8.5"
+APP_VERSION = "0.8.6"
 PUBLISHER = "BC Shin Studio"
 COPYRIGHT = "© 2026 BC Shin Studio. All rights reserved."
 WEBSITE = "https://www.bcshinstudio.com"
