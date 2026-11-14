@@ -3,7 +3,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QIcon, QKeySequence, QShortcut, QUndoStack
 from PySide6.QtWidgets import QMainWindow, QMessageBox
-from .config import APP_VERSION, PUBLISHER, COPYRIGHT, WEBSITE, asset_path
+from .config import APP_VERSION, PUBLISHER, COPYRIGHT, WEBSITE, asset_path, application_icon_path
 from .canvas import Canvas
 from .performance import memory_working_set_mb, memory_peak_working_set_mb, memory_private_mb
 from .project import ProjectPersistenceMixin
@@ -17,7 +17,7 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("MontaSpace")
-        self.setWindowIcon(QIcon(str(asset_path("assets/MontaSpace.ico"))))
+        self.setWindowIcon(QIcon(str(application_icon_path())))
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.FramelessWindowHint)
         self.resize(900, 600)
         self.setMinimumSize(400, 300)
@@ -91,9 +91,9 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
             f"Images on board: {len(items)}\n"
             f"Unique image previews: {len(pixmaps)}\n"
             f"Estimated decoded preview pixels: {estimated_mb:.1f} MB\n"
-            f"Current process RAM (Windows working set): {ram_text}\n"
+            f"Current process RAM (Windows working set / macOS RSS): {ram_text}\n"
             f"Peak process RAM (since launch): {peak_text}\n"
-            f"Private committed memory (Windows): {private_text}\n"
+            f"Private memory (Windows committed / macOS physical footprint): {private_text}\n"
             f"Undo history entries: {self.undo_stack.count()}\n\n"
             "Preview pixel estimate excludes Qt, Undo history, and other "
             "application memory. Portable projects still embed original files."
