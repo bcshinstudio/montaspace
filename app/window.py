@@ -5,6 +5,7 @@ from PySide6.QtGui import QIcon, QKeySequence, QShortcut, QUndoStack
 from PySide6.QtWidgets import QMainWindow, QMessageBox
 from .config import APP_VERSION, PUBLISHER, COPYRIGHT, WEBSITE, asset_path, application_icon_path
 from .canvas import Canvas
+from .shortcut_help import ShortcutHelp
 from .performance import memory_working_set_mb, memory_peak_working_set_mb, memory_private_mb
 from .project import ProjectPersistenceMixin
 from .window_resize import (EDGE_MARGIN, ResizeHint, resize_cursor,
@@ -26,6 +27,7 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
         # The viewport covers almost the entire frameless window. Qt delivers
         # most pointer events to it rather than to QMainWindow.
         self._resize_hint = ResizeHint(self.canvas.viewport())
+        self._border_visible = True
         self._resize_hover_edges = Qt.Edge(0)
         self.canvas.setMouseTracking(True)
         self.canvas.viewport().setMouseTracking(True)
@@ -37,6 +39,7 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
         self.undo_stack.setUndoLimit(50)
         self._embedded_sources = set()
         self._temp_extract = None
+        self._shortcut_help = None
         self._saved_snapshot = self.project_snapshot()
 
         for shortcut, callback in (
@@ -49,9 +52,28 @@ class MontaSpace(ProjectPersistenceMixin, QMainWindow):
             ("Ctrl+Shift+Z", self.perform_redo),
             ("Ctrl+D", self.canvas.duplicate_selected),
             ("Ctrl+A", self.select_all),
+            ("F1", self.toggle_shortcut_help),
+            ("Ctrl+H", self.toggle_shortcut_help),
+            ("Ctrl+Shift+B", self.toggle_whiteboard_border),
         ):
             key = QShortcut(QKeySequence(shortcut), self)
             key.activated.connect(callback)
+
+    def toggle_shortcut_help(self):
+        """Show or hide the nonblocking photo shortcut reference."""
+        if self._shortcut_help is None:
+            self._shortcut_help = ShortcutHelp(self)
+        if self._shortcut_help.isVisible():
+            self._shortcut_help.hide()
+        else:
+            self._shortcut_help.show()
+            self._shortcut_help.raise_()
+            self._shortcut_help.activateWindow()
+
+    def toggle_whiteboard_border(self):
+        """Show or hide the subtle whiteboard boundary."""
+        self._border_visible = not self._border_visible
+        self._resize_hint.set_border_visible(self._border_visible)
 
     def show_about(self):
         """Display version and publisher attribution."""

@@ -31,6 +31,15 @@ class Canvas(QGraphicsView):
         self._crop_disabled_items = []
         self._restoring = False
 
+    def paintEvent(self, event):
+        """Draw the border hint on the existing canvas viewport, not a child window."""
+        super().paintEvent(event)
+        hint = getattr(self.window, "_resize_hint", None)
+        if hint is not None and (hint.border_visible or hint.edges):
+            painter = QPainter(self.viewport())
+            hint.paint(painter)
+            painter.end()
+
     def capture_state(self):
         """Immutable metadata for active items (pixmaps remain shared in memory)."""
         return tuple(
@@ -348,6 +357,8 @@ class Canvas(QGraphicsView):
         select_all_action = menu.addAction("Select All            Ctrl+A")
         delete_action = menu.addAction("Delete Selected") if selected else None
         menu.addSeparator()
+        shortcuts_action = menu.addAction("Keyboard Shortcuts...    F1 / Ctrl+H")
+        border_action = menu.addAction("Show/Hide Canvas Boundary    Ctrl+Shift+B")
         performance_action = menu.addAction("Performance Info...")
         about_action = menu.addAction("About MontaSpace...")
         minimize_action = menu.addAction("Minimize")
@@ -384,6 +395,10 @@ class Canvas(QGraphicsView):
             self.arrange_image(image, operation)
         elif delete_action is not None and chosen == delete_action:
             self.delete_selected_items()
+        elif chosen == shortcuts_action:
+            self.window.toggle_shortcut_help()
+        elif chosen == border_action:
+            self.window.toggle_whiteboard_border()
         elif chosen == performance_action:
             self.window.show_performance_info()
         elif chosen == about_action:

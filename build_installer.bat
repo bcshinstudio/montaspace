@@ -2,9 +2,9 @@
 setlocal
 cd /d "%~dp0"
 set "PY=.venv\Scripts\python.exe"
-set "SETUP=installer-output\MontaSpace_Setup_0.8.6.exe"
+set "SETUP=installer-output\MontaSpace_Setup_0.8.7.exe"
 
-echo MontaSpace v0.8.6 - installer validation candidate
+echo MontaSpace v0.8.7 - installer validation candidate
 if not exist "%PY%" (
   echo ERROR: Missing .venv Python environment.
   goto :fail
